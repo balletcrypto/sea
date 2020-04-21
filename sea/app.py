@@ -17,10 +17,12 @@ class Sea:
     config_class = Config
     debug = ConfigAttribute("DEBUG")
     testing = ConfigAttribute("TESTING")
+    tz = ConfigAttribute("TIMEZONE")
     default_config = ImmutableDict(
         {
             "DEBUG": False,
             "TESTING": False,
+            "TIMEZONE": "UTC",
             "GRPC_WORKERS": 10,
             "GRPC_HOST": "[::]",
             "GRPC_PORT": 50051,
