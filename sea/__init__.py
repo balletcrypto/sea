@@ -1,8 +1,12 @@
 import os
 import sys
 
-from sea.utils import import_string
+from sea.app import Sea
 from sea.local import Proxy
+from sea.utils import import_string
+
+__all__ = ("Sea", "create_app", "current_app")
+
 
 __version__ = "2.2.0"
 _app = None

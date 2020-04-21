@@ -1,11 +1,12 @@
-import sys
-import os
 import argparse
-import pkg_resources
 import logging
+import os
+import sys
 
-from sea.utils import import_string
+import pkg_resources
+
 from sea import create_app
+from sea.utils import import_string
 
 
 class JobException(RuntimeError):

@@ -1,9 +1,9 @@
+import logging
 import signal
 import time
-import logging
 from concurrent import futures
-import grpc
 
+import grpc
 from sea import signals
 
 
@@ -26,9 +26,16 @@ class Server:
     def run(self):
         # run prometheus client
         if self.app.config["PROMETHEUS_SCRAPE"]:
-            from prometheus_client import start_http_server
+            try:
+                from prometheus_client import start_http_server
 
-            start_http_server(self.app.config["PROMETHEUS_PORT"])
+                # start in the thread
+                start_http_server(self.app.config["PROMETHEUS_PORT"])
+            except ImportError:
+                logging.warning(
+                    "Prometheus reporter not running, Please install prometheus_client."
+                )
+
         # run grpc server
         for name, (add_func, servicer) in self.app.servicers.items():
             add_func(servicer(), self.server)

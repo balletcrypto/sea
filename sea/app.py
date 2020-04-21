@@ -4,10 +4,10 @@ import os.path
 
 from sea import exceptions, utils
 from sea.config import Config, ConfigAttribute
-from sea.datatypes import ImmutableDict, ConstantsObject
+from sea.datatypes import ConstantsObject, ImmutableDict
 
 
-class BaseApp:
+class Sea:
     """The BaseApp object implements grpc application
 
     :param root_path: the root path
@@ -17,18 +17,16 @@ class BaseApp:
     config_class = Config
     debug = ConfigAttribute("DEBUG")
     testing = ConfigAttribute("TESTING")
-    tz = ConfigAttribute("TIMEZONE")
     default_config = ImmutableDict(
         {
             "DEBUG": False,
             "TESTING": False,
-            "TIMEZONE": "UTC",
-            "GRPC_WORKERS": 3,
+            "GRPC_WORKERS": 10,
             "GRPC_HOST": "[::]",
-            "GRPC_PORT": 6000,
+            "GRPC_PORT": 50051,
             "GRPC_LOG_LEVEL": "WARNING",
             "GRPC_LOG_HANDLER": logging.StreamHandler(),
-            "GRPC_LOG_FORMAT": "[%(asctime)s %(levelname)s in %(module)s] %(message)s",  # NOQA
+            "GRPC_LOG_FORMAT": "[%(asctime)s %(levelname)s in %(module)s] %(message)s",
             "GRPC_GRACE": 5,
             "PROMETHEUS_SCRAPE": False,
             "PROMETHEUS_PORT": 9091,
