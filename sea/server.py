@@ -1,10 +1,7 @@
 import logging
-import signal
-import time
-from concurrent import futures
 
-import grpc
-from sea import signals
+from grpclib.server import Server as RPCServer
+from grpclib.utils import graceful_exit
 
 
 class Server:
@@ -16,14 +13,15 @@ class Server:
     def __init__(self, app):
         self.app = app
         self.setup_logger()
-        self.workers = self.app.config["GRPC_WORKERS"]
         self.host = self.app.config["GRPC_HOST"]
         self.port = self.app.config["GRPC_PORT"]
-        self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=self.workers))
-        self.server.add_insecure_port("{}:{}".format(self.host, self.port))
-        self._stopped = False
+        _servicer_handlers = []
+        for _, (_, servicer) in self.app.servicers.items():
+            # TODO handler wrap middleware
+            _servicer_handlers.append(servicer())
+        self.server = RPCServer(_servicer_handlers)
 
-    def run(self):
+    async def run(self):
         # run prometheus client
         if self.app.config["PROMETHEUS_SCRAPE"]:
             try:
@@ -37,14 +35,11 @@ class Server:
                 )
 
         # run grpc server
-        for name, (add_func, servicer) in self.app.servicers.items():
-            add_func(servicer(), self.server)
-        self.server.start()
-        signals.server_started.send(self)
-        self.register_signal()
-        while not self._stopped:
-            time.sleep(1)
-        signals.server_stopped.send(self)
+        with graceful_exit([self.server]):
+            await self.server.start(self.host, self.port)
+            logging.info(f"Serving on [{self.host}]:{self.port}")
+            await self.server.wait_closed()
+
         return True
 
     def setup_logger(self):
@@ -55,15 +50,3 @@ class Server:
         logger = logging.getLogger()
         logger.setLevel(lvl)
         logger.addHandler(h)
-
-    def register_signal(self):
-        signal.signal(signal.SIGINT, self._stop_handler)
-        signal.signal(signal.SIGHUP, self._stop_handler)
-        signal.signal(signal.SIGTERM, self._stop_handler)
-        signal.signal(signal.SIGQUIT, self._stop_handler)
-
-    def _stop_handler(self, signum, frame):
-        grace = self.app.config["GRPC_GRACE"]
-        self.server.stop(grace)
-        time.sleep(grace or 1)
-        self._stopped = True

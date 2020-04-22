@@ -3,9 +3,10 @@ import sys
 
 from sea.app import Sea
 from sea.local import Proxy
+from sea.server import Server
 from sea.utils import import_string
 
-__all__ = ("Sea", "create_app", "current_app")
+__all__ = ("Sea", "create_app", "current_app", "Server")
 
 
 __version__ = "2.2.0"

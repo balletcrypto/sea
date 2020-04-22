@@ -1,5 +1,5 @@
-from types import FunctionType
 from functools import wraps
+from types import FunctionType
 
 from sea import current_app
 
