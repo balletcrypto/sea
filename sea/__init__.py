@@ -26,13 +26,28 @@ def create_app(root_path=None):
     env = os.environ.get("SEA_ENV", "development")
     config = import_string("configs.{}".format(env))
 
-    app_class = import_string("app:App")
+    try:
+        app_class = import_string("app:App")
+    except ImportError:
+        app_class = Sea
+
     _app = app_class(root_path, env=env)
     _app.config.from_object(config)
 
-    _app.load_middlewares()
-    _app.load_extensions_in_module(import_string("app.extensions"))
-    _app.load_servicers_in_module(import_string("app.servicers"))
+    try:
+        _app.load_middlewares()
+    except ImportError as e:
+        _app.logger.warning(e)
+
+    try:
+        _app.load_extensions_in_module(import_string("app.extensions"))
+    except ImportError as e:
+        _app.logger.warning(e)
+
+    try:
+        _app.load_servicers_in_module(import_string("app.servicers"))
+    except ImportError as e:
+        _app.logger.warning(e)
 
     _app.ready()
 
