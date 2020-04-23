@@ -1,15 +1,15 @@
 import os
 
-from sea.cli import jobm, JobException
 from sea import current_app
-from sea.server import Server
+from sea.cli import JobException, jobm
 
-
-@jobm.job("server", aliases=["s"], help="Run Server")
-def server():
-    s = Server(current_app)
-    s.run()
-    return 0
+# from sea import Server
+# TODO console_scripts can not run async function
+# @jobm.job("server", aliases=["s"], help="Run Server")
+# def server():
+#     s = Server(current_app)
+#     s.run()
+#     return 0
 
 
 @jobm.job("console", aliases=["c"], help="Run Console")

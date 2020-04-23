@@ -17,17 +17,17 @@ class Sea:
     config_class = Config
     debug = ConfigAttribute("DEBUG")
     testing = ConfigAttribute("TESTING")
+    tz = ConfigAttribute("TIMEZONE")
     default_config = ImmutableDict(
         {
             "DEBUG": False,
             "TESTING": False,
-            "GRPC_WORKERS": 10,
-            "GRPC_HOST": "[::]",
+            "TIMEZONE": "UTC",
+            "GRPC_HOST": "::",
             "GRPC_PORT": 50051,
             "GRPC_LOG_LEVEL": "WARNING",
             "GRPC_LOG_HANDLER": logging.StreamHandler(),
             "GRPC_LOG_FORMAT": "[%(asctime)s %(levelname)s in %(module)s] %(message)s",
-            "GRPC_GRACE": 5,
             "PROMETHEUS_SCRAPE": False,
             "PROMETHEUS_PORT": 9091,
             "MIDDLEWARES": ["sea.middleware.RpcErrorMiddleware"],

@@ -107,4 +107,4 @@ ENV/
 *.sql
 
 # pipenv
-Pipfile*
+Pipfile.lock
