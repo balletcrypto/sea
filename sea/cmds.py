@@ -1,6 +1,6 @@
 import os
 
-from sea import current_app
+from sea import Sea
 from sea.cli import JobException, jobm
 
 # from sea import Server
@@ -19,7 +19,7 @@ def console():
         the following vars are included:
         `app` (the current app)
         """
-    ctx = {"app": current_app}
+    ctx = {"app": Sea(__name__)}
     try:
         from IPython import embed
 
@@ -50,6 +50,7 @@ def generate(proto_path, protos):
     from grpc_tools import protoc
 
     well_known_path = os.path.join(os.path.dirname(protoc.__file__), "_proto")
+    print(well_known_path)
 
     proto_out = os.path.join(os.getcwd(), "protos")
     proto_path.append(well_known_path)
@@ -62,6 +63,8 @@ def generate(proto_path, protos):
         "--python_out",
         proto_out,
         "--grpc_python_out",
+        proto_out,
+        "--python_grpc_out",
         proto_out,
         *protos,
     ]
