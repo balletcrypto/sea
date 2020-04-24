@@ -5,7 +5,6 @@ import sys
 
 import pkg_resources
 
-from sea import create_app
 from sea.utils import import_string
 
 
@@ -23,7 +22,7 @@ class JobManager:
     def __init__(self):
         self._jobs = {}
 
-    def job(self, name, inapp=True, env="development", proxy=False, *args, **kwargs):
+    def job(self, name, inapp=False, env="development", proxy=False, *args, **kwargs):
         def wrapper(func):
             func.parser = JobOption(*args, **kwargs)
             func.proxy = proxy
@@ -93,7 +92,8 @@ def _run(root):
     handler = kwargs.pop("handler")
     os.environ.setdefault("SEA_ENV", handler.env)
     if handler.inapp:
-        create_app()
+        # create app
+        ...
     try:
         if handler.proxy:
             return handler(**kwargs, argv=argv)

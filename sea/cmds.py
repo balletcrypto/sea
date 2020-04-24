@@ -32,7 +32,7 @@ def console():
     return 0
 
 
-@jobm.job("generate", aliases=["g"], inapp=False, help="Generate RPC")
+@jobm.job("generate", aliases=["g"], help="Generate RPC")
 @jobm.option(
     "-I",
     "--proto_path",
@@ -68,7 +68,7 @@ def generate(proto_path, protos):
     return protoc.main(cmd)
 
 
-@jobm.job("test", env="testing", inapp=False, proxy=True, help="run test")
+@jobm.job("test", env="testing", proxy=True, help="run test")
 def runtest(argv):
     import pytest
     from sea import create_app
@@ -80,7 +80,7 @@ def runtest(argv):
     return pytest.main(argv, plugins=[AppPlugin])
 
 
-@jobm.job("new", aliases=["n"], inapp=False, help="Create Sea Project")
+@jobm.job("new", aliases=["n"], help="Create Sea Project")
 @jobm.option("project", help="project name")
 @jobm.option(
     "--skip-git", action="store_true", help="skip add git files and run git init"

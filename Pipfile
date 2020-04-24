@@ -4,13 +4,12 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pytest = "*"
 
 [packages]
 grpclib = "==0.3.1"
 grpcio-tools = "==1.28.1"
 protobuf = "==3.11.3"
-pendulum = "*"
-blinker = "*"
 jinja2 = "*"
 
 [requires]

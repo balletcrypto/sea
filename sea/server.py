@@ -1,6 +1,7 @@
 import logging
 
-from grpclib.server import Server as RPCServer
+from grpclib.reflection.service import ServerReflection
+from grpclib.server import Server as GRPCServer
 from grpclib.utils import graceful_exit
 
 
@@ -15,11 +16,10 @@ class Server:
         self.setup_logger()
         self.host = self.app.config["GRPC_HOST"]
         self.port = self.app.config["GRPC_PORT"]
-        _servicer_handlers = []
-        for _, (_, servicer) in self.app.servicers.items():
-            # TODO handler wrap middleware
-            _servicer_handlers.append(servicer())
-        self.server = RPCServer(_servicer_handlers)
+        _servicers = [servicer() for _, servicer in self.app.servicers.items()]
+        if self.app.config["GRPC_REFLECTION"]:
+            _servicers = ServerReflection.extend(_servicers)
+        self.server = GRPCServer(_servicers)
 
     async def run(self):
         # run prometheus client
@@ -34,7 +34,7 @@ class Server:
                     "Prometheus reporter not running, Please install prometheus_client."
                 )
 
-        # run grpc server
+        # run grpc server, handle SIGINT and SIGTERM signals.
         with graceful_exit([self.server]):
             await self.server.start(self.host, self.port)
             logging.info(f"Serving on [{self.host}]:{self.port}")
@@ -43,6 +43,7 @@ class Server:
         return True
 
     def setup_logger(self):
+        # TODO
         fmt = self.app.config["GRPC_LOG_FORMAT"]
         lvl = self.app.config["GRPC_LOG_LEVEL"]
         h = self.app.config["GRPC_LOG_HANDLER"]

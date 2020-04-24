@@ -1,6 +1,5 @@
-import inspect
 import logging
-import os.path
+import os
 
 from sea import exceptions, utils
 from sea.config import Config, ConfigAttribute
@@ -25,7 +24,8 @@ class Sea:
             "TIMEZONE": "UTC",
             "GRPC_HOST": "::",
             "GRPC_PORT": 50051,
-            "GRPC_LOG_LEVEL": "WARNING",
+            "GRPC_LOG_LEVEL": "INFO",
+            "GRPC_REFLECTION": False,
             "GRPC_LOG_HANDLER": logging.StreamHandler(),
             "GRPC_LOG_FORMAT": "[%(asctime)s %(levelname)s in %(module)s] %(message)s",
             "PROMETHEUS_SCRAPE": False,
@@ -34,16 +34,18 @@ class Sea:
         }
     )
 
-    def __init__(self, root_path, env):
+    def __init__(self, root_path):
         if not os.path.isabs(root_path):
             root_path = os.path.abspath(root_path)
         self.root_path = root_path
         self.name = os.path.basename(root_path)
-        self.env = env
-        self.config = self.config_class(root_path, self.default_config)
+        self.env = os.environ.get("SEA_ENV", "default")
+        self.config = self.make_config()
         self._servicers = {}
-        self._extensions = {}
-        self._middlewares = []
+        # self._extensions = {}
+
+    def make_config(self):
+        return self.config_class(self.root_path, self.default_config)
 
     @utils.cached_property
     def logger(self):
@@ -63,65 +65,52 @@ class Sea:
         return rv
 
     @utils.cached_property
-    def extensions(self):
-        rv = ConstantsObject(self._extensions)
-        del self._extensions
-        return rv
-
-    @utils.cached_property
     def middlewares(self):
         rv = tuple(self._middlewares)
         del self._middlewares
         return rv
 
-    def _register_servicer(self, servicer):
-        """register serviser
+    def register_servicer(self, servicers):
+        """register servisers
 
-        :param servicer: servicer
+        :param servicers: servicer list
         """
-        name = servicer.__name__
-        if name in self._servicers:
-            raise exceptions.ConfigException("servicer duplicated: {}".format(name))
-        add_func = self._get_servicer_add_func(servicer)
-        self._servicers[name] = (add_func, servicer)
+        for servicer in servicers:
+            name = servicer.__name__
+            if name in self._servicers:
+                raise exceptions.ConfigException("servicer duplicated: {}".format(name))
+            self._servicers[name] = servicer
 
-    def _get_servicer_add_func(self, servicer):
-        for b in servicer.__bases__:
-            if b.__name__.endswith("Servicer"):
-                m = inspect.getmodule(b)
-                return getattr(m, "add_{}_to_server".format(b.__name__))
+    async def run(self):
+        from sea.server import Server
 
-    def _register_extension(self, name, ext):
-        """register extension
+        if len(self.servicers) == 0:
+            raise RuntimeError("No servicers loaded")
 
-        :param name: extension name
-        :param ext: extension object
-        """
-        ext.init_app(self)
-        if name in self._extensions:
-            raise exceptions.ConfigException("extension duplicated: {}".format(name))
-        self._extensions[name] = ext
+        await Server(self).run()
 
-    def load_middlewares(self):
-        mids = ["sea.middleware.GuardMiddleware"] + self.config.get("MIDDLEWARES")
-        for mn in mids:
-            m = utils.import_string(mn)
-            self._middlewares.insert(0, m)
-        return self.middlewares
+    # TODO
+    # @utils.cached_property
+    # def extensions(self):
+    #     rv = ConstantsObject(self._extensions)
+    #     del self._extensions
+    #     return rv
 
-    def load_extensions_in_module(self, module):
-        def is_ext(ins):
-            return not inspect.isclass(ins) and hasattr(ins, "init_app")
+    # def _register_extension(self, name, ext):
+    #     """register extension
 
-        for n, ext in inspect.getmembers(module, is_ext):
-            self._register_extension(n, ext)
-        return self.extensions
+    #     :param name: extension name
+    #     :param ext: extension object
+    #     """
+    #     ext.init_app(self)
+    #     if name in self._extensions:
+    #         raise exceptions.ConfigException("extension duplicated: {}".format(name))
+    #     self._extensions[name] = ext
 
-    def load_servicers_in_module(self, module):
-        for _, _servicer in inspect.getmembers(module, inspect.isclass):
-            if _servicer.__name__.endswith("Servicer"):
-                self._register_servicer(_servicer)
-        return self.servicers
+    # def load_extensions_in_module(self, module):
+    #     def is_ext(ins):
+    #         return not inspect.isclass(ins) and hasattr(ins, "init_app")
 
-    def ready(self):
-        pass
+    #     for n, ext in inspect.getmembers(module, is_ext):
+    #         self._register_extension(n, ext)
+    #     return self.extensions
