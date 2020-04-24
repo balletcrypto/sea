@@ -12,12 +12,12 @@ from sea.cli import JobException, jobm
 #     return 0
 
 
-@jobm.job("console", aliases=["c"], help="Run Console")
+@jobm.job("shell", aliases=["c"], help="Run Console in shell")
 def console():
     banner = """
         [Sea Console]:
         the following vars are included:
-        `app` (the current app)
+        `app` (the Sea(__name__))
         """
     ctx = {"app": Sea(__name__)}
     try:
@@ -69,18 +69,6 @@ def generate(proto_path, protos):
         *protos,
     ]
     return protoc.main(cmd)
-
-
-@jobm.job("test", env="testing", proxy=True, help="run test")
-def runtest(argv):
-    import pytest
-    from sea import create_app
-
-    class AppPlugin:
-        def pytest_load_initial_conftests(early_config, parser, args):
-            create_app()
-
-    return pytest.main(argv, plugins=[AppPlugin])
 
 
 @jobm.job("new", aliases=["n"], help="Create Sea Project")

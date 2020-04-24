@@ -13,15 +13,14 @@ class Sea:
     :param env: the env
     """
 
-    config_class = Config
+    _config_class = Config
     debug = ConfigAttribute("DEBUG")
     testing = ConfigAttribute("TESTING")
-    tz = ConfigAttribute("TIMEZONE")
+
     default_config = ImmutableDict(
         {
             "DEBUG": False,
             "TESTING": False,
-            "TIMEZONE": "UTC",
             "GRPC_HOST": "::",
             "GRPC_PORT": 50051,
             "GRPC_LOG_LEVEL": "INFO",
@@ -45,7 +44,7 @@ class Sea:
         # self._extensions = {}
 
     def make_config(self):
-        return self.config_class(self.root_path, self.default_config)
+        return self._config_class(self.root_path, self.default_config)
 
     @utils.cached_property
     def logger(self):
