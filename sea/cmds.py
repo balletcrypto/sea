@@ -1,6 +1,6 @@
 import os
 
-from sea import current_app
+from sea import Sea
 from sea.cli import JobException, jobm
 
 # from sea import Server
@@ -12,14 +12,14 @@ from sea.cli import JobException, jobm
 #     return 0
 
 
-@jobm.job("console", aliases=["c"], help="Run Console")
+@jobm.job("shell", aliases=["c"], help="Run Console in shell")
 def console():
     banner = """
         [Sea Console]:
         the following vars are included:
-        `app` (the current app)
+        `app` (the Sea(__name__))
         """
-    ctx = {"app": current_app}
+    ctx = {"app": Sea(__name__)}
     try:
         from IPython import embed
 
@@ -63,21 +63,11 @@ def generate(proto_path, protos):
         proto_out,
         "--grpc_python_out",
         proto_out,
+        "--python_grpc_out",
+        proto_out,
         *protos,
     ]
     return protoc.main(cmd)
-
-
-@jobm.job("test", env="testing", proxy=True, help="run test")
-def runtest(argv):
-    import pytest
-    from sea import create_app
-
-    class AppPlugin:
-        def pytest_load_initial_conftests(early_config, parser, args):
-            create_app()
-
-    return pytest.main(argv, plugins=[AppPlugin])
 
 
 @jobm.job("new", aliases=["n"], help="Create Sea Project")
