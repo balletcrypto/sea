@@ -50,7 +50,6 @@ def generate(proto_path, protos):
     from grpc_tools import protoc
 
     well_known_path = os.path.join(os.path.dirname(protoc.__file__), "_proto")
-    print(well_known_path)
 
     proto_out = os.path.join(os.getcwd(), "protos")
     proto_path.append(well_known_path)
