@@ -41,17 +41,24 @@ def console():
     help="the dir in which we'll search the proto files",
 )
 @jobm.option(
+    "-O",
+    "--proto_out_path",
+    required=True,
+    help="the dir in which we'll generate the output proto files",
+)
+@jobm.option(
     "protos",
     nargs="+",
     help="the proto files which will be compiled."
     'the paths are related to the path defined in "-I"',
 )
-def generate(proto_path, protos):
+def generate(proto_path, proto_out_path, protos):
     from grpc_tools import protoc
 
     well_known_path = os.path.join(os.path.dirname(protoc.__file__), "_proto")
 
-    proto_out = os.path.join(os.getcwd(), "protos")
+    proto_out = os.path.join(os.getcwd(), proto_out_path)
+
     proto_path.append(well_known_path)
     proto_path_args = []
     for protop in proto_path:
