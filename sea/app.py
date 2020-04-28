@@ -64,9 +64,11 @@ class Sea:
         """
         for servicer in servicers:
             name = servicer.__name__
-            if name in self._servicers:
+            if name in self.servicers:
                 raise exceptions.ConfigException("servicer duplicated: {}".format(name))
-            self.servicers[name] = servicer
+            obj = servicer()
+            obj.app = self
+            self.servicers[name] = obj
 
     async def run(self):
         from sea.server import Server

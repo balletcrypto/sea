@@ -5,7 +5,7 @@ def is_immutable(self):
     raise TypeError("%r objects are immutable" % self.__class__.__name__)
 
 
-class ImmutableDict(dict):
+class ConstantsObject(dict):
     _hash_cache = None
 
     @classmethod
@@ -34,10 +34,16 @@ class ImmutableDict(dict):
         is_immutable(self)
 
     def __setitem__(self, key, value):
-        is_immutable(self)
+        super().__setitem__(key, value)
 
     def __delitem__(self, key):
         is_immutable(self)
+
+    def __getattr__(self, name):
+        return self[name]
+
+    def __setattr__(self, name, value):
+        self[name] = value
 
     def clear(self):
         is_immutable(self)
@@ -55,16 +61,10 @@ class ImmutableDict(dict):
     def __copy__(self):
         return self
 
-
-class ConstantsObject(ImmutableDict):
-    def __setitem__(self, key, value):
-        self.__setitem__(key, value)
-
-    def __getattr__(self, name):
-        return self[name]
-
-    def __setattr__(self, name, value):
-        self[name] = value
-
     def __dir__(self):
         return self.keys()
+
+
+class ImmutableDict(ConstantsObject):
+    def __setitem__(self, key, value):
+        is_immutable(self)

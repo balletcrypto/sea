@@ -16,7 +16,7 @@ class Server:
         self.setup_logger()
         self.host = self.app.config["GRPC_HOST"]
         self.port = self.app.config["GRPC_PORT"]
-        _servicers = [servicer() for _, servicer in self.app.servicers.items()]
+        _servicers = [servicer for _, servicer in self.app.servicers.items()]
         if self.app.config["GRPC_REFLECTION"]:
             _servicers = ServerReflection.extend(_servicers)
         self.server = GRPCServer(_servicers)
