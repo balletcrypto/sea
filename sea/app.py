@@ -29,7 +29,6 @@ class Sea:
             "GRPC_LOG_FORMAT": "[%(asctime)s %(levelname)s in %(module)s] %(message)s",
             "PROMETHEUS_SCRAPE": False,
             "PROMETHEUS_PORT": 9091,
-            "MIDDLEWARES": ["sea.middleware.RpcErrorMiddleware"],
         }
     )
 
@@ -64,9 +63,9 @@ class Sea:
         return rv
 
     @utils.cached_property
-    def middlewares(self):
-        rv = tuple(self._middlewares)
-        del self._middlewares
+    def extensions(self):
+        rv = ConstantsObject(self._extensions)
+        del self._extensions
         return rv
 
     def register_servicer(self, servicers):
@@ -80,6 +79,8 @@ class Sea:
                 raise exceptions.ConfigException("servicer duplicated: {}".format(name))
             self._servicers[name] = servicer
 
+        return self.servicers
+
     async def run(self):
         from sea.server import Server
 
@@ -88,28 +89,14 @@ class Sea:
 
         await Server(self).run()
 
-    # TODO
-    # @utils.cached_property
-    # def extensions(self):
-    #     rv = ConstantsObject(self._extensions)
-    #     del self._extensions
-    #     return rv
+    def register_extension(self, exts):
+        """register extension
 
-    # def _register_extension(self, name, ext):
-    #     """register extension
-
-    #     :param name: extension name
-    #     :param ext: extension object
-    #     """
-    #     ext.init_app(self)
-    #     if name in self._extensions:
-    #         raise exceptions.ConfigException("extension duplicated: {}".format(name))
-    #     self._extensions[name] = ext
-
-    # def load_extensions_in_module(self, module):
-    #     def is_ext(ins):
-    #         return not inspect.isclass(ins) and hasattr(ins, "init_app")
-
-    #     for n, ext in inspect.getmembers(module, is_ext):
-    #         self._register_extension(n, ext)
-    #     return self.extensions
+        :param exts: extension object
+        """
+        for ext in exts:
+            ext.init_app(self)
+            if ext.name in self._extensions:
+                raise exceptions.ConfigException(f"extension duplicated: {ext.name}")
+            self._extensions[ext.name] = ext
+        return self.extensions
