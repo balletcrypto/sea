@@ -1,7 +1,7 @@
-import pytest
-import pickle
 import copy
+import pickle
 
+import pytest
 from sea import datatypes
 
 
@@ -75,5 +75,5 @@ class TestConstantsObject:
         data = {"foo": 1, "bar": 2, "baz": 3}
         d = datatypes.ConstantsObject(data)
         assert d.foo == 1
-        with pytest.raises(TypeError) as exc:
-            d.foo = 2
+        d.foo = 2
+        assert d.foo == 2

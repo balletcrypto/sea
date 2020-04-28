@@ -39,8 +39,9 @@ class Sea:
         self.name = os.path.basename(root_path)
         self.env = os.environ.get("SEA_ENV", "default")
         self.config = self.make_config()
-        self._servicers = {}
-        # self._extensions = {}
+
+        self.servicers = ConstantsObject()
+        self.extensions = ConstantsObject()
 
     def make_config(self):
         return self._config_class(self.root_path, self.default_config)
@@ -56,18 +57,6 @@ class Sea:
             logger.addHandler(h)
         return logger
 
-    @utils.cached_property
-    def servicers(self):
-        rv = ConstantsObject(self._servicers)
-        del self._servicers
-        return rv
-
-    @utils.cached_property
-    def extensions(self):
-        rv = ConstantsObject(self._extensions)
-        del self._extensions
-        return rv
-
     def register_servicer(self, servicers):
         """register servisers
 
@@ -77,9 +66,7 @@ class Sea:
             name = servicer.__name__
             if name in self._servicers:
                 raise exceptions.ConfigException("servicer duplicated: {}".format(name))
-            self._servicers[name] = servicer
-
-        return self.servicers
+            self.servicers[name] = servicer
 
     async def run(self):
         from sea.server import Server
@@ -88,15 +75,3 @@ class Sea:
             raise RuntimeError("No servicers loaded")
 
         await Server(self).run()
-
-    def register_extension(self, exts):
-        """register extension
-
-        :param exts: extension object
-        """
-        for ext in exts:
-            ext.init_app(self)
-            if ext.name in self._extensions:
-                raise exceptions.ConfigException(f"extension duplicated: {ext.name}")
-            self._extensions[ext.name] = ext
-        return self.extensions

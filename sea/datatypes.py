@@ -57,6 +57,9 @@ class ImmutableDict(dict):
 
 
 class ConstantsObject(ImmutableDict):
+    def __setitem__(self, key, value):
+        self.__setitem__(key, value)
+
     def __getattr__(self, name):
         return self[name]
 
