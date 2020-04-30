@@ -21,9 +21,8 @@ class ConfigAttribute:
 
 
 class Config(dict):
-    def __init__(self, root_path, defaults=None):
+    def __init__(self, defaults=None):
         super().__init__(defaults or {})
-        self.root_path = root_path
 
     def from_object(self, obj):
         for key in dir(obj):

@@ -1,5 +1,4 @@
 import logging
-import os
 
 from sea import exceptions, utils
 from sea.config import Config, ConfigAttribute
@@ -10,7 +9,6 @@ class Sea:
     """The BaseApp object implements grpc application
 
     :param root_path: the root path
-    :param env: the env
     """
 
     _config_class = Config
@@ -32,19 +30,15 @@ class Sea:
         }
     )
 
-    def __init__(self, root_path):
-        if not os.path.isabs(root_path):
-            root_path = os.path.abspath(root_path)
-        self.root_path = root_path
-        self.name = os.path.basename(root_path)
-        self.env = os.environ.get("SEA_ENV", "default")
+    def __init__(self, name):
+        self.name = name
         self.config = self.make_config()
 
         self.servicers = ConstantsObject()
         self.extensions = ConstantsObject()
 
     def make_config(self):
-        return self._config_class(self.root_path, self.default_config)
+        return self._config_class(self.default_config)
 
     @utils.cached_property
     def logger(self):
