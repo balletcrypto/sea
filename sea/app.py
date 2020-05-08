@@ -20,8 +20,7 @@ class Sea:
             "DEBUG": False,
             "TESTING": False,
             "LOG_LEVEL": "INFO",
-            "LOG_HANDLER": logging.StreamHandler(),
-            "LOG_FORMAT": "[%(asctime)s %(levelname)s in %(module)s] %(message)s",
+            "LOG_FORMAT": "%(asctime)s:%(filename)s:%(lineno)d %(levelname)s/%(processName)s %(message)s",
             "GRPC_HOST": "::",
             "GRPC_PORT": 50051,
             "GRPC_REFLECTION": False,
@@ -43,13 +42,15 @@ class Sea:
     @utils.cached_property
     def logger(self):
         logger = logging.getLogger("sea.app")
-        if self.debug and logger.level == logging.DEBUG:
-            logger.setLevel(logging.DEBUG)
-        if not utils.logger_has_level_handler(logger):
-            h = logging.StreamHandler()
-            h.setFormatter(logging.Formatter("%(message)s"))
-            logger.addHandler(h)
+        logger.propagate = False  # disable root logger
 
+        level = self.config["LOG_LEVEL"]
+        logger.setLevel(level)
+
+        h = logging.StreamHandler()
+        h.setLevel(level)
+        h.setFormatter(logging.Formatter(self.config["LOG_FORMAT"]))
+        logger.addHandler(h)
         return logger
 
     def register_servicer(self, servicers):
