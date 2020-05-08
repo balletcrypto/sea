@@ -51,22 +51,3 @@ class Singleton(type):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
-
-
-def logger_has_level_handler(logger):
-    """Check if there is a handler in the logging chain that will handle the
-    given logger's :meth:`effective level <~logging.Logger.getEffectiveLevel>`.
-    """
-    level = logger.getEffectiveLevel()
-    current = logger
-
-    while current:
-        if any(handler.level <= level for handler in current.handlers):
-            return True
-
-        if not current.propagate:
-            break
-
-        current = current.parent
-
-    return False
