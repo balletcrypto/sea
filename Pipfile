@@ -8,6 +8,7 @@ pytest = "*"
 
 [packages]
 grpclib = "==0.3.1"
+grpcio = "==1.28.1"
 grpcio-tools = "==1.28.1"
 protobuf = "==3.11.3"
 
