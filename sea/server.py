@@ -35,7 +35,7 @@ class Server:
         # run grpc server, handle SIGINT and SIGTERM signals.
         with graceful_exit([self.server]):
             await self.server.start(self.host, self.port)
-            self._logger.info(f"Serving on [{self.host}]:{self.port}")
+            # self._logger.info(f"Serving on [{self.host}]:{self.port}")
             await self.server.wait_closed()
             self._logger.info("Server closed")
 
