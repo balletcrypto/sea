@@ -37,6 +37,9 @@ class Server:
             await self.server.start(self.host, self.port)
             self._logger.info(f"Serving on [{self.host}]:{self.port}")
             await self.server.wait_closed()
-            self._logger.info("Server closed")
+            for func in self.app.on_shutdown:
+                await func()
+
+            self._logger.info("Server shutdown")
 
         return True

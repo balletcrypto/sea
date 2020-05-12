@@ -35,6 +35,11 @@ class Sea:
 
         self.servicers = ConstantsObject()
         self.extensions = ConstantsObject()
+        self._on_shutdown = []
+
+    @property
+    def on_shutdown(self):
+        return self._on_shutdown
 
     def make_config(self):
         return self._config_class(self.default_config)
