@@ -21,7 +21,7 @@ class Sea:
             "TESTING": False,
             "LOG_LEVEL": "INFO",
             "LOG_FORMAT": "%(asctime)s:%(filename)s:%(lineno)d %(levelname)s/%(processName)s %(message)s",
-            "GRPC_HOST": "::",
+            "GRPC_HOST": "0.0.0.0",
             "GRPC_PORT": 50051,
             "GRPC_REFLECTION": False,
             "PROMETHEUS_SCRAPE": False,

@@ -39,7 +39,7 @@ setup(
     description="shanbay rpc framework",
     long_description=readme,
     long_description_content_type="text/markdown",
-    url="https://github.com/shanbay/sea",
+    url="https://github.com/balletcrypto/sea",
     author="Michael Ding",
     author_email="yandy.ding@gmail.com",
     license="MIT",
@@ -50,8 +50,6 @@ setup(
         "Operating System :: POSIX",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Topic :: Internet",
@@ -60,13 +58,7 @@ setup(
     keywords=["rpc", "grpc"],
     packages=find_packages(exclude=["tests"]),
     package_data={"sea": find_package_data("sea")},
-    python_requires=">=3",
+    python_requires=">=3.7",
     install_requires=requirements,
-    entry_points={
-        "console_scripts": ["sea=sea.cli:main"],
-        "sea.jobs": [
-            "async_task=sea.contrib.extensions.celery.cmd:async_task",
-            "bus=sea.contrib.extensions.celery.cmd:bus",
-        ],
-    },
+    entry_points={"console_scripts": ["sea=sea.cli:main"]},
 )

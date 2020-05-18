@@ -60,16 +60,13 @@ class Server:
         listen(self.server, SendMessage, self.on_send_message)
 
         # run grpc server, handle SIGINT and SIGTERM signals.
-        try:
-            with graceful_exit([self.server]):
-                await self.server.start(self.host, self.port)
-                self._logger.info(f"Serving on [{self.host}]:{self.port}")
-                await self.server.wait_closed()
-                for func in self.app.on_shutdown:
-                    await func()
+        with graceful_exit([self.server]):
+            await self.server.start(self.host, self.port)
+            self._logger.info(f"Serving on [{self.host}]:{self.port}")
+            await self.server.wait_closed()
+            for func in self.app.on_shutdown:
+                await func()
 
-                self._logger.info("Server shutdown")
-        except SystemExit:
-            self._logger.error("SystemExit")
+            self._logger.info("Server shutdown")
 
         return True
