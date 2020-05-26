@@ -67,9 +67,11 @@ class Sea:
             name = servicer.__name__
             if name in self.servicers:
                 raise exceptions.ConfigException("servicer duplicated: {}".format(name))
-            obj = servicer()
-            obj.app = self
-            self.servicers[name] = obj
+            svc = servicer()
+            if hasattr(svc, "inject_app"):
+                svc.inject_app(self)
+
+            self.servicers[name] = svc
 
     async def run(self):
         from sea.server import Server
