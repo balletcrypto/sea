@@ -2,7 +2,7 @@ import contextvars
 import time
 from typing import Optional, cast
 
-from grpclib.events import RecvRequest, SendMessage, listen
+from grpclib.events import RecvRequest, SendTrailingMetadata, listen
 from grpclib.reflection.service import ServerReflection
 from grpclib.server import Server as GRPCServer
 from grpclib.utils import graceful_exit
@@ -36,7 +36,7 @@ class Server:
             "req_id: {}, recv method call {}".format(r_id, event.method_name)
         )
 
-    async def on_send_message(self, event: SendMessage) -> None:
+    async def on_send_trailing_metadata(self, event: SendTrailingMetadata) -> None:
         self._logger.info(
             "req_id: {}, Execution time {:.2f} ms".format(
                 request_id.get(), (time.perf_counter() - float(start_time.get())) * 1000
@@ -56,8 +56,9 @@ class Server:
                     "Prometheus reporter not running, Please install prometheus_client."
                 )
 
+        # https://grpclib.readthedocs.io/en/latest/overview.html#grpclib
         listen(self.server, RecvRequest, self.on_recv_request)
-        listen(self.server, SendMessage, self.on_send_message)
+        listen(self.server, SendTrailingMetadata, self.on_send_trailing_metadata)
 
         # run grpc server, handle SIGINT and SIGTERM signals.
         with graceful_exit([self.server]):
