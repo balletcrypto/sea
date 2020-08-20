@@ -28,7 +28,7 @@ class Server:
         if self.app.config["GRPC_REFLECTION"]:
             _servicers = ServerReflection.extend(_servicers)
 
-        if self.app.config["HEALTH_CHECKING"]:
+        if self.app.config["GRPC_HEALTH_CHECKING"]:
             _servicers += [Health()]
 
         self.server = GRPCServer(_servicers)
