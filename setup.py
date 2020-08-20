@@ -36,7 +36,7 @@ def find_package_data(package):
 setup(
     name="sea",
     version=version,
-    description="shanbay rpc framework",
+    description="rpc framework",
     long_description=readme,
     long_description_content_type="text/markdown",
     url="https://github.com/balletcrypto/sea",

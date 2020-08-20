@@ -1,4 +1,4 @@
-grpcio-tools>=1.28.1
-grpcio>=1.28.1
-grpclib>=0.3.1
-protobuf>=3.11.3
+grpcio-tools>=1.31.1
+grpcio>=1.31.1
+grpclib>=0.3.2
+protobuf>=3.13.0
