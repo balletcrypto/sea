@@ -4,6 +4,7 @@ from typing import Optional, cast
 
 from grpclib.events import RecvRequest, SendTrailingMetadata, listen
 from grpclib.reflection.service import ServerReflection
+from grpclib.health.service import Health
 from grpclib.server import Server as GRPCServer
 from grpclib.utils import graceful_exit
 
@@ -22,9 +23,14 @@ class Server:
         self.app = app
         self.host = self.app.config["GRPC_HOST"]
         self.port = self.app.config["GRPC_PORT"]
+
         _servicers = [servicer for _, servicer in self.app.servicers.items()]
         if self.app.config["GRPC_REFLECTION"]:
             _servicers = ServerReflection.extend(_servicers)
+
+        if self.app.config["HEALTH_CHECKING"]:
+            _servicers += [Health()]
+
         self.server = GRPCServer(_servicers)
         self._logger = self.app.logger
 

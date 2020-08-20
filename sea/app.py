@@ -24,6 +24,7 @@ class Sea:
             "GRPC_HOST": "0.0.0.0",
             "GRPC_PORT": 50051,
             "GRPC_REFLECTION": False,
+            "HEALTH_CHECKING": False,
             "PROMETHEUS_SCRAPE": False,
             "PROMETHEUS_PORT": 9091,
         }
