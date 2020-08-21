@@ -58,7 +58,7 @@ class Server:
                 # start in a thread
                 start_http_server(self.app.config["PROMETHEUS_PORT"])
             except ImportError:
-                self._logger.logging.warning(
+                self._logger.warning(
                     "Prometheus reporter not running, Please install prometheus_client."
                 )
 
